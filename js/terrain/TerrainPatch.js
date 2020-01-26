@@ -1,4 +1,4 @@
-var TerrainPatch = function (x, y, z, width, depth, widthSegments, depthSegments, perlin) {
+var TerrainPatch = function (x, y, z, width, depth, widthSegments, depthSegments, perlin, maxHeight, waterLevel) {
 
     this.x = x;
     this.y = y;
@@ -7,15 +7,14 @@ var TerrainPatch = function (x, y, z, width, depth, widthSegments, depthSegments
     this.depth = depth;
     this.widthSegments = widthSegments;
     this.depthSegments = depthSegments;
-
-    this.maxHeight = Math.floor((this.width + this.depth) / 2) / 1;
-    this.waterLevel = - (1 / 3) * this.maxHeight;
+    this.perlin = perlin;
+    this.maxHeight = maxHeight;
+    this.waterLevel = waterLevel;
 
     // internals
     this.geometry;
     this.material;
     this.mesh;
-    this.perlin = perlin;
 
     this.generateHeight = function () {
         var size = this.widthSegments * this.depthSegments;
@@ -44,53 +43,85 @@ var TerrainPatch = function (x, y, z, width, depth, widthSegments, depthSegments
                     // console.log();
                 }
             }
-            console.log("noiseScale: " + noiseScale);
-            console.log("positionScale: " + positionScale);
+            // console.log("noiseScale: " + noiseScale);
+            // console.log("positionScale: " + positionScale);
         }
         return data;
     }
 
     this.generateGeometry = function () {
         var data = this.generateHeight(widthSegments, depthSegments);
-        this.geometry = new THREE.PlaneBufferGeometry(this.width, this.depth, this.widthSegments - 1, this.depthSegments - 1);
-        // this.geometry.rotateX(- Math.PI / 2);
+        this.geometry = new THREE.PlaneGeometry(this.width, this.depth, this.widthSegments - 1, this.depthSegments - 1);
 
-        var vertices = this.geometry.attributes.position.array;
-
-        for (var i = 0, j = 0, l = vertices.length; i < l; i++ , j += 3) {
-            vertices[j] += this.x;
-            vertices[j + 1] += this.y;
-            vertices[j + 2] += data[i] + this.z;
-            if (vertices[j + 2] < this.waterLevel) {
-                vertices[j + 2] = this.waterLevel;
-            }
+        var dataIndex = 0;
+        for (vertex of this.geometry.vertices) {
+            vertex.x += this.x;
+            vertex.y += this.y;
+            vertex.z += data[dataIndex++] + this.z;
+            // if (vertex.z < this.waterLevel) {
+            //     vertex.z = this.waterLevel;
+            // }
 
         }
         this.addColorToTerrain();
     }
 
     this.addColorToTerrain = function () {
-        const waterColor = { r: 68 / 255, g: 204 / 255, b: 255 / 255 };
-        const terrainColor1 = { r: 238 / 255, g: 204 / 255, b: 68 / 255 };
-        const terrainColor2 = 0x228800;
-        const terrainColor3 = 0x116600;
-        const terrainColor4 = 0x113300;
+        new THREE.Color("rgb(96, 80, 64)");
+        new THREE.Color("rgb(238, 204, 68)");
+        new THREE.Color("rgb(34, 136, 0)");
+        new THREE.Color("rgb(17, 102, 0)");
+        new THREE.Color("rgb(17, 51, 0)");
 
-        var verticesLength = this.geometry.attributes.position.array.length;
+        const underWaterColor = new THREE.Color("rgb(96, 80, 64)"), heightCuttoff0 = this.waterLevel;
+        const terrainColor1 = new THREE.Color("rgb(238, 204, 68)"), heightCuttoff1 = 0;
+        const terrainColor2 = new THREE.Color("rgb(34, 136, 0)"), heightCuttoff2 = this.maxHeight * (2 / 4);
+        const terrainColor3 = new THREE.Color("rgb(17, 102, 0)"), heightCuttoff3 = this.maxHeight * (3 / 4);
+        const terrainColor4 = new THREE.Color("rgb(17, 51, 0)"), heightCuttoff4 = this.maxHeight;
+        const terrainColor5 = new THREE.Color("rgb(255, 255, 255)");
 
-        var colors = [];
+        for (face of this.geometry.faces) {
 
-        for (var i = 0; i < verticesLength; i += 3) {
-            var z = this.geometry.attributes.position.array[i + 2];
-            if (z <= this.waterLevel) {
-                colors.push(waterColor.r, waterColor.g, waterColor.b);
-            } else {
-                colors.push(terrainColor1.r, terrainColor1.g, terrainColor1.b);
+            const a = this.geometry.vertices[face.a]
+            var color = new THREE.Color();
+            var fractionToTop = 0;
+            var colorBottom, colorTop;
+
+            if (a.z <= heightCuttoff0) {
+                fractionToTop = 1 - ((heightCuttoff0 - a.z) / (heightCuttoff0 - -this.maxHeight));
+                colorBottom = underWaterColor;
+                colorTop = terrainColor1;
             }
-        }
+            else if (a.z <= heightCuttoff1) {
+                fractionToTop = 1 - ((heightCuttoff1 - a.z) / (heightCuttoff1 - heightCuttoff0));
+                colorBottom = terrainColor1;
+                colorTop = terrainColor2;
+            }
+            else if (a.z <= heightCuttoff2) {
+                fractionToTop = 1 - ((heightCuttoff2 - a.z) / (heightCuttoff2 - heightCuttoff1));
+                colorBottom = terrainColor2;
+                colorTop = terrainColor3;
+            }
+            else if (a.z <= heightCuttoff3) {
+                fractionToTop = 1 - ((heightCuttoff3 - a.z) / (heightCuttoff3 - heightCuttoff2));
+                colorBottom = terrainColor3;
+                colorTop = terrainColor4;
+            }
+            else {
+                fractionToTop = 1 - ((heightCuttoff4 - a.z) / (heightCuttoff4 - heightCuttoff3));
+                colorBottom = terrainColor4;
+                colorTop = terrainColor5;
+            }
 
-        this.geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-        console.log(this.geometry);
+            color.r = colorBottom.r + fractionToTop * (colorTop.r - colorBottom.r);
+            color.g = colorBottom.g + fractionToTop * (colorTop.g - colorBottom.g);
+            color.b = colorBottom.b + fractionToTop * (colorTop.b - colorBottom.b);
+
+            var colorAddition = (Math.random() - 0.5) / 30;
+
+            face.color.setRGB(color.r + colorAddition, color.g + colorAddition, color.b + colorAddition);
+            // console.log(face.color);
+        }
 
         this.geometry.colorsNeedUpdate = true;
     }

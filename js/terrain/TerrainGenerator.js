@@ -1,14 +1,19 @@
 var TerrainGenerator = function (widthPatches, depthPatches, patchWidth, patchDepth) {
 
-    this.terrainPatches = new Array;
     this.widthPatches = widthPatches;
     this.depthPatches = depthPatches;
-
-    // internal for now
     this.patchWidth = patchWidth;
     this.patchDepth = patchDepth;
-    this.patchWidthSegments = 10;
-    this.patchDepthSegments = 10;
+
+    // internal for now
+    this.totalWidth = this.patchWidth * this.widthPatches;
+    this.totalDepth = this.patchDepth * this.depthPatches;
+    this.terrainPatches = new Array;
+    this.patchWidthSegments = 20;
+    this.patchDepthSegments = 20;
+
+    this.maxHeight = Math.floor((this.patchWidth + this.patchDepth) / 2) / 1;
+    this.waterLevel = - (1 / 3) * this.maxHeight;
 
     this.combinedTerrainMesh;
 
@@ -19,13 +24,36 @@ var TerrainGenerator = function (widthPatches, depthPatches, patchWidth, patchDe
     this.createTerrainPatches = function () {
         for (var i = 0; i < this.widthPatches; i++) {
             for (var j = 0; j < this.depthPatches; j++) {
-                var patchX = i * this.patchWidth;
-                var patchY = j * this.patchDepth;
+                var patchX = i * this.patchWidth + this.patchWidth / 2;
+                var patchY = j * this.patchDepth + this.patchDepth / 2;
                 var patchZ = 0;
-                var patch = new TerrainPatch(patchX, patchY, patchZ, this.patchWidth, this.patchDepth, this.patchWidthSegments, this.patchDepthSegments, perlin);
+
+                var patch = new TerrainPatch(patchX, patchY, patchZ, this.patchWidth, this.patchDepth, this.patchWidthSegments,
+                    this.patchDepthSegments, perlin, this.maxHeight, this.waterLevel);
+
                 this.terrainPatches.push(patch);
             }
         }
+    }
+
+    this.addWaterToScene = function (scene) {
+        var waterGeometry = new THREE.PlaneGeometry(this.totalWidth, this.totalDepth, 2, 2);
+
+        for (vertex of waterGeometry.vertices) {
+            vertex.x += this.totalWidth / 2;
+            vertex.y += this.totalDepth / 2;
+            vertex.z += this.waterLevel;
+        }
+
+        var waterMaterial = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(0x44CCFF),
+            opacity: 0.5,
+            transparent: true,
+            flatShading: true
+        });
+        // waterMaterial.wireframe = true;
+        var waterMesh = new THREE.Mesh(waterGeometry, waterMaterial);
+        scene.add(waterMesh);
     }
 
     this.addTerrainToScene = function (scene) {
@@ -34,26 +62,28 @@ var TerrainGenerator = function (widthPatches, depthPatches, patchWidth, patchDe
         }
     }
 
-    this.createCombinedTerrain = function () {
-        var patchGeometries = new Array;
-        for (terrain of this.terrainPatches) {
-            patchGeometries.push(terrain.getMesh().geometry);
-        }
 
-        var combinedTerrainGeometry = BufferGeometryUtils.mergeBufferGeometries(patchGeometries);
 
-        material = new THREE.MeshStandardMaterial({ color: "green" });
-        material.flatShading = true;
-        // this.material.wireframe = true;
+    // this.createCombinedTerrain = function () {
+    //     var patchGeometries = new Array;
+    //     for (terrain of this.terrainPatches) {
+    //         patchGeometries.push(terrain.getMesh().geometry);
+    //     }
 
-        this.combinedTerrainMesh = new THREE.Mesh(combinedTerrainGeometry, material);
-    }
+    //     var combinedTerrainGeometry = BufferGeometryUtils.mergeBufferGeometries(patchGeometries);
 
-    this.addCombinedTerrainToScene = function (scene) {
-        scene.add(this.combinedTerrainMesh);
-    }
+    //     material = new THREE.MeshStandardMaterial({ color: "green" });
+    //     material.flatShading = true;
+    //     // this.material.wireframe = true;
+
+    //     this.combinedTerrainMesh = new THREE.Mesh(combinedTerrainGeometry, material);
+    // }
+
+    // this.addCombinedTerrainToScene = function (scene) {
+    //     scene.add(this.combinedTerrainMesh);
+    // }
 
     this.createTerrainPatches();
-    this.createCombinedTerrain();
+    // this.createCombinedTerrain();
 
 };
