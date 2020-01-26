@@ -33,6 +33,7 @@
 
     <script src="./js/terrain/TerrainPatch.js"></script>
     <script src="./js/terrain/TerrainGenerator.js"></script>
+    <script src="./js/water/Water.js"></script>
 
 
 </head>
@@ -68,16 +69,19 @@
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0x333333);
 
-            // scene.fog = new THREE.Fog(0x333333, 500, 1000);
+            // scene.fog = new THREE.Fog(0x333333, 5000, 10000);
 
 
-            var widthPatches = 10, depthPatches = 10;
+            var widthPatches = 20, depthPatches = 20;
             var patchWidth = 1000, patchDepth = 1000;
             var totalWidth = patchWidth * widthPatches;
             var totalDepth = patchDepth * depthPatches;
             var terrainGenerator = new TerrainGenerator(widthPatches, depthPatches, patchWidth, patchDepth);
             terrainGenerator.addTerrainToScene(scene);
-            terrainGenerator.addWaterToScene(scene);
+
+            var waterLevel = terrainGenerator.waterLevel;
+            var water = new Water(totalWidth / 2, totalDepth / 2, waterLevel, totalWidth, totalDepth, 2, 2);
+            water.addWaterToScene(scene);
             // terrainGenerator.addCombinedTerrainToScene(scene);
 
             camera.position.x = totalWidth / 2;

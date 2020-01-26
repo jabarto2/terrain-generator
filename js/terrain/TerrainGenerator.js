@@ -9,8 +9,8 @@ var TerrainGenerator = function (widthPatches, depthPatches, patchWidth, patchDe
     this.totalWidth = this.patchWidth * this.widthPatches;
     this.totalDepth = this.patchDepth * this.depthPatches;
     this.terrainPatches = new Array;
-    this.patchWidthSegments = 20;
-    this.patchDepthSegments = 20;
+    this.patchWidthSegments = 10;
+    this.patchDepthSegments = 10;
 
     this.maxHeight = Math.floor((this.patchWidth + this.patchDepth) / 2) / 1;
     this.waterLevel = - (1 / 3) * this.maxHeight;
@@ -36,33 +36,11 @@ var TerrainGenerator = function (widthPatches, depthPatches, patchWidth, patchDe
         }
     }
 
-    this.addWaterToScene = function (scene) {
-        var waterGeometry = new THREE.PlaneGeometry(this.totalWidth, this.totalDepth, 2, 2);
-
-        for (vertex of waterGeometry.vertices) {
-            vertex.x += this.totalWidth / 2;
-            vertex.y += this.totalDepth / 2;
-            vertex.z += this.waterLevel;
-        }
-
-        var waterMaterial = new THREE.MeshStandardMaterial({
-            color: new THREE.Color(0x44CCFF),
-            opacity: 0.5,
-            transparent: true,
-            flatShading: true
-        });
-        // waterMaterial.wireframe = true;
-        var waterMesh = new THREE.Mesh(waterGeometry, waterMaterial);
-        scene.add(waterMesh);
-    }
-
     this.addTerrainToScene = function (scene) {
         for (terrain of this.terrainPatches) {
             scene.add(terrain.getMesh());
         }
     }
-
-
 
     // this.createCombinedTerrain = function () {
     //     var patchGeometries = new Array;

@@ -117,7 +117,7 @@ var TerrainPatch = function (x, y, z, width, depth, widthSegments, depthSegments
             color.g = colorBottom.g + fractionToTop * (colorTop.g - colorBottom.g);
             color.b = colorBottom.b + fractionToTop * (colorTop.b - colorBottom.b);
 
-            var colorAddition = (Math.random() - 0.5) / 30;
+            var colorAddition = (Math.random() - 0.5) / 20;
 
             face.color.setRGB(color.r + colorAddition, color.g + colorAddition, color.b + colorAddition);
             // console.log(face.color);
