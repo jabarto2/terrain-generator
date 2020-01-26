@@ -12,7 +12,9 @@ var TerrainGenerator = function (widthPatches, depthPatches, patchWidth, patchDe
 
     this.combinedTerrainMesh;
 
-    var perlin = new ImprovedNoise();
+    // var perlin = new ImprovedNoise();
+    var perlin = new Perlin();
+    perlin.seed(Math.random());
 
     this.createTerrainPatches = function () {
         for (var i = 0; i < this.widthPatches; i++) {
