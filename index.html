@@ -69,7 +69,7 @@
 
             camera.position.x = 0;
             camera.position.y = 0;
-            camera.position.z = 4000;
+            camera.position.z = 1000;
             camera.up = new THREE.Vector3(0, 0, 1);
 
             var cylinderGeometry = new THREE.CylinderGeometry(50, 50, 1000, 32);
@@ -79,7 +79,7 @@
             scene.add(cylinderMesh);
 
 
-            var widthPatches = 5, depthPatches = 5;
+            var widthPatches = 20, depthPatches = 20;
             var patchWidth = 1000, patchDepth = 1000;
             var totalWidth = patchWidth * widthPatches;
             var totalDepth = patchDepth * depthPatches;
@@ -87,12 +87,9 @@
             terrainGenerator = new TerrainGenerator(scene, widthPatches, depthPatches, patchWidth, patchDepth);
             terrainGenerator.updateTerrain(camera.position);
 
-
             // var waterLevel = terrainGenerator.waterLevel;
             // var water = new Water(totalWidth / 2, totalDepth / 2, waterLevel, totalWidth, totalDepth, 2, 2);
             // water.addWaterToScene(scene);
-            // terrainGenerator.addCombinedTerrainToScene(scene);
-
 
             console.log(camera.position);
 

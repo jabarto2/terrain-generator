@@ -13,7 +13,7 @@ var TerrainGenerator = function (scene, widthPatches, depthPatches, patchWidth, 
     this.patchWidthSegments = 10;
     this.patchDepthSegments = 10;
 
-    this.maxHeight = Math.floor((this.patchWidth + this.patchDepth) / 2) / 1;
+    this.maxHeight = Math.floor((this.patchWidth + this.patchDepth) / 2) / 2;
     this.waterLevel = - (1 / 3) * this.maxHeight;
 
     this.perlin = new Perlin();
@@ -36,7 +36,7 @@ var TerrainGenerator = function (scene, widthPatches, depthPatches, patchWidth, 
                 newTerrainPatchCenterKeys.add(JSON.stringify(patchCenter));
             }
         }
-        console.log("TerrainGenerator::calculateTerrainPatchCenters: newTerrainPatchCenterKeys ="), console.log(newTerrainPatchCenterKeys);
+        // console.log("TerrainGenerator::calculateTerrainPatchCenters: newTerrainPatchCenterKeys ="), console.log(newTerrainPatchCenterKeys);
         return newTerrainPatchCenterKeys;
     }
 
@@ -72,9 +72,9 @@ var TerrainGenerator = function (scene, widthPatches, depthPatches, patchWidth, 
 
         this.terrainPatchMap = newTerrainPatchMap;
 
-        console.log("TerrainGenerator::updateTerrainPatchCenters: patchesToAddToScene = "), console.log(patchesToAddToScene);
-        console.log("TerrainGenerator::updateTerrainPatchCenters: patchesToRemoveFromScene = "), console.log(patchesToRemoveFromScene);
-        console.log("TerrainGenerator::updateTerrainPatchCenters: this.terrainPatchMap = "), console.log(this.terrainPatchMap);
+        // console.log("TerrainGenerator::updateTerrainPatchCenters: patchesToAddToScene = "), console.log(patchesToAddToScene);
+        // console.log("TerrainGenerator::updateTerrainPatchCenters: patchesToRemoveFromScene = "), console.log(patchesToRemoveFromScene);
+        // console.log("TerrainGenerator::updateTerrainPatchCenters: this.terrainPatchMap = "), console.log(this.terrainPatchMap);
     }
 
 

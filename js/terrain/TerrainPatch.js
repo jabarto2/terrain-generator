@@ -25,7 +25,7 @@ var TerrainPatch = function (x, y, z, width, depth, widthSegments, depthSegments
             var index = 0;
 
             var noiseScale = this.maxHeight * ((cycle + 1) / cycles);
-            var positionScale = 3 * (this.width + this.depth) / 2 * ((cycle + 1) / cycles);
+            var positionScale = 2 * (this.width + this.depth) / 2 * ((cycle + 1) / cycles);
 
             // odd for loop order to ensure we loop through buffergeometry correctly
             for (var j = this.depthSegments - 1; j >= 0; j--) {
@@ -63,7 +63,7 @@ var TerrainPatch = function (x, y, z, width, depth, widthSegments, depthSegments
             // }
 
         }
-        // this.addColorToTerrain();
+        this.addColorToTerrain();
     }
 
     this.addColorToTerrain = function () {
@@ -130,7 +130,7 @@ var TerrainPatch = function (x, y, z, width, depth, widthSegments, depthSegments
         var color = '#' + Math.floor(Math.random() * 16777215).toString(16);
         // var color = "green";
         this.material = new THREE.MeshStandardMaterial();
-        this.material.color = new THREE.Color(color);
+        // this.material.color = new THREE.Color(color);
         this.material.vertexColors = THREE.VertexColors;
         this.material.flatShading = true;
         // this.material.wireframe = true;
