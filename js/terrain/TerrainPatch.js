@@ -63,7 +63,7 @@ var TerrainPatch = function (x, y, z, width, depth, widthSegments, depthSegments
             // }
 
         }
-        this.addColorToTerrain();
+        // this.addColorToTerrain();
     }
 
     this.addColorToTerrain = function () {
@@ -130,6 +130,7 @@ var TerrainPatch = function (x, y, z, width, depth, widthSegments, depthSegments
         var color = '#' + Math.floor(Math.random() * 16777215).toString(16);
         // var color = "green";
         this.material = new THREE.MeshStandardMaterial();
+        this.material.color = new THREE.Color(color);
         this.material.vertexColors = THREE.VertexColors;
         this.material.flatShading = true;
         // this.material.wireframe = true;
