@@ -2,19 +2,10 @@
 <html lang="en">
 
 <head>
-    <title>three.js webgl - geometry - terrain</title>
+    <title>Terrain Generator</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <style>
-        body {
-            background-color: #bfd1e5;
-            color: #61443e;
-        }
-
-        a {
-            color: #a06851;
-        }
-
         #container,
         body {
             overflow: hidden;
@@ -63,13 +54,15 @@
             camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 20000);
 
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x333333);
 
-            // scene.fog = new THREE.Fog(0x333333, 5000, 10000);
+            var backgroundColor = 0x87ceeb;
+            scene.background = new THREE.Color(backgroundColor);
+
+            // scene.fog = new THREE.Fog(backgroundColor, 5000, 10000);
 
             camera.position.x = 0;
             camera.position.y = 0;
-            camera.position.z = 1000;
+            camera.position.z = 5000;
             camera.up = new THREE.Vector3(0, 0, 1);
 
             var cylinderGeometry = new THREE.CylinderGeometry(50, 50, 1000, 32);
@@ -117,6 +110,25 @@
 
         }
 
+        function getCameraGroundPlaneIntersection() {
+            var cameraAxisVector = new THREE.Vector3(0, 0, -1);
+            cameraAxisVector.applyQuaternion(camera.quaternion);
+
+            var distanceAlongVectorToPlane = (0 - camera.position.z) / cameraAxisVector.z;
+
+            var intersectionPointX = camera.position.x + distanceAlongVectorToPlane * cameraAxisVector.x;
+            var intersectionPointY = camera.position.y + distanceAlongVectorToPlane * cameraAxisVector.y;
+            var intersectionPointZ = camera.position.z + distanceAlongVectorToPlane * cameraAxisVector.z;
+
+            var intersectionPoint = new THREE.Vector3(intersectionPointX, intersectionPointY, intersectionPointZ);
+
+            console.log(camera.position);
+            console.log(cameraAxisVector);
+            console.log(intersectionPoint);
+            console.log("end");
+            return intersectionPoint;
+        }
+
         function onWindowResize() {
 
             camera.aspect = window.innerWidth / window.innerHeight;
@@ -135,8 +147,8 @@
         }
 
         function render() {
-
-            terrainGenerator.updateTerrain(camera.position);
+            var cameraPlaneIntersectionPoint = getCameraGroundPlaneIntersection();
+            terrainGenerator.updateTerrain(cameraPlaneIntersectionPoint);
 
             controls.update(clock.getDelta());
             renderer.render(scene, camera);

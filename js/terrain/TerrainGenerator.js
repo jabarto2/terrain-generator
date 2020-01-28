@@ -102,7 +102,7 @@ var TerrainGenerator = function (scene, widthPatches, depthPatches, patchWidth, 
         var centerY = Math.round(cameraPosition.y / this.patchDepth) * this.patchDepth;
         var centerZ = 0;
         var combinedPatchCenter = new THREE.Vector3(centerX, centerY, centerZ);
-        console.log(combinedPatchCenter);
+        // console.log(combinedPatchCenter);
         var newTerrainPatchCenters = this.calculateTerrainPatchCenters(combinedPatchCenter);
         this.updateTerrainPatchCenters(newTerrainPatchCenters);
     }
